@@ -1,16 +1,31 @@
-import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import auth from '../../firebase.init';
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 
 const Register = () => {
+    const navigate = useNavigate();
+    const [ error, setError ] = useState();
     const emailRef = useRef( '' );
     const passwordRef = useRef( '' );
     const cPasswordRef = useRef( '' );
+
+    const [ createUserWithEmailAndPassword, user ] = useCreateUserWithEmailAndPassword( auth );
+
+    if ( user ) {
+        navigate( '/' );
+    }
     const handleSubmit = event => {
         event.preventDefault();
         const email = emailRef.current.value;
         const password = passwordRef.current.value;
         const confirmPassword = cPasswordRef.current.value;
-        console.log( email, password, confirmPassword );
+        if ( password !== confirmPassword ) {
+            setError( 'Password do not metch! Try again' );
+            return;
+        }
+        createUserWithEmailAndPassword( email, password );
+
     };
 
     return (
@@ -33,6 +48,7 @@ const Register = () => {
                                     <input ref={cPasswordRef} type="password" className="form-control" name='confirmPassword' id="floatingPassword" placeholder="Password" required />
                                     <label for="floatingPassword">Confirm Password</label>
                                 </div>
+                                <p className='text-danger'>{error}</p>
 
                                 <div className="form-check d-flex mb-2">
                                     <input className="form-check-input mr-2" type="checkbox" value="" id="rememberPasswordCheck" />

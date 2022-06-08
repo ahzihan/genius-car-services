@@ -1,13 +1,39 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import './Login.css';
+import auth from '../../firebase.init';
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
+const provider = new GoogleAuthProvider();
 const Login = () => {
+    const [ error, setError ] = useState();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [ signInWithEmailAndPassword, user ] = useSignInWithEmailAndPassword( auth );
+
+    const from = location.state?.from?.pathname || "/";
+    if ( user ) {
+        navigate( from, { replace: true } );
+    }
+
     const handleSubmit = event => {
         event.preventDefault();
         const email = event.target.email.value;
         const password = event.target.password.value;
-        console.log( email, password );
+        signInWithEmailAndPassword( email, password );
+
+    };
+    const handleGoogleSignIn = () => {
+        signInWithPopup( auth, provider )
+            .then( result => {
+                const user = result.user;
+                if ( user ) {
+                    navigate( from, { replace: true } );
+                }
+            } ).catch( error => {
+                console.error( error );
+            } );
     };
     return (
         <div className="body">
@@ -25,6 +51,7 @@ const Login = () => {
                                     <input type="password" className="form-control" name='password' id="floatingPassword" placeholder="Password" required />
                                     <label for="floatingPassword">Password</label>
                                 </div>
+                                <p className='text-danger'>{error}</p>
 
                                 <div className="form-check d-flex mb-2">
                                     <input className="form-check-input mr-2" type="checkbox" value="" id="rememberPasswordCheck" />
@@ -37,7 +64,7 @@ const Login = () => {
                                 <p className='mb-0'>New to Genus car? <Link className='text-danger text-decoration-none' to='/register'>Please Register</Link></p>
                                 <hr className="my-4" />
                                 <div className="d-grid mb-2">
-                                    <button className="btn btn-danger text-white text-uppercase fw-bold"
+                                    <button onClick={handleGoogleSignIn} className="btn btn-danger text-white text-uppercase fw-bold"
                                         type="submit">Sign in with Google</button>
                                 </div>
                                 <div className="d-grid">
