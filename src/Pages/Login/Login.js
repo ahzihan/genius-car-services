@@ -1,26 +1,50 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { useSendPasswordResetEmail, useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import './Login.css';
 import auth from '../../firebase.init';
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import Loading from '../Shared/Loading/Loading';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const provider = new GoogleAuthProvider();
 const Login = () => {
-    const [ error, setError ] = useState();
+    const emailRef = useRef( '' );
     const navigate = useNavigate();
     const location = useLocation();
-    const [ signInWithEmailAndPassword, user ] = useSignInWithEmailAndPassword( auth );
-
+    const [ signInWithEmailAndPassword, user, loading, error ] = useSignInWithEmailAndPassword( auth );
+    const [ sendPasswordResetEmail, sending ] = useSendPasswordResetEmail( auth );
+    let errorMessage;
     const from = location.state?.from?.pathname || "/";
     if ( user ) {
         navigate( from, { replace: true } );
     }
+    if ( loading ) {
+        return <Loading></Loading>;
+    }
+
+    if ( error ) {
+        errorMessage = <p className='text-danger'>Error: {error?.message}</p>;
+    }
+
+    const resetPassword = async () => {
+        const email = emailRef.current.value;
+        if ( email ) {
+            await sendPasswordResetEmail( email );
+            toast( 'Sent email' );
+        } else {
+            toast( 'Please Enter your email address.' );
+        }
+
+    };
 
     const handleSubmit = event => {
         event.preventDefault();
         const email = event.target.email.value;
         const password = event.target.password.value;
+
         signInWithEmailAndPassword( email, password );
 
     };
@@ -44,24 +68,24 @@ const Login = () => {
                             <h5 className="card-title text-center mb-5 fw-bold fs-5">Sign In</h5>
                             <form onSubmit={handleSubmit}>
                                 <div className="form-floating mb-3">
-                                    <input type="email" className="form-control" name='email' id="floatingInput" placeholder="name@example.com" required />
+                                    <input ref={emailRef} type="email" className="form-control" name='email' id="floatingInput" placeholder="name@example.com" required />
                                     <label for="floatingInput">Email address</label>
                                 </div>
                                 <div className="form-floating mb-3">
-                                    <input type="password" className="form-control" name='password' id="floatingPassword" placeholder="Password" required />
+                                    <input type="password" className="form-control" name='password' id="floatingPassword" placeholder="Password" />
                                     <label for="floatingPassword">Password</label>
                                 </div>
-                                <p className='text-danger'>{error}</p>
+                                <p className='text-danger'>{errorMessage}</p>
 
-                                <div className="form-check d-flex mb-2">
-                                    <input className="form-check-input mr-2" type="checkbox" value="" id="rememberPasswordCheck" />
-                                    <label class="form-check-label" for="rememberPasswordCheck">Remember password</label>
-                                </div>
                                 <div className="d-grid">
                                     <button className="btn btn-primary btn-login text-uppercase fw-bold"
                                         type="submit">Sign in</button>
                                 </div>
-                                <p className='mb-0'>New to Genus car? <Link className='text-danger text-decoration-none' to='/register'>Please Register</Link></p>
+
+                                <p className='mb-0'>New to Genus car? <Link className='text-primary text-decoration-none' to='/register'>Please Register</Link></p>
+
+                                <p className='mb-0'>Reset Password? <button onClick={resetPassword} className='text-primary btn btn-link text-decoration-none'>Forget Password</button></p>
+
                                 <hr className="my-4" />
                                 <div className="d-grid mb-2">
                                     <button onClick={handleGoogleSignIn} className="btn btn-danger text-white text-uppercase fw-bold"
@@ -71,6 +95,7 @@ const Login = () => {
                                     <button className="btn btn-primary text-white text-uppercase fw-bold"
                                         type="submit">Sign in with Facebook</button>
                                 </div>
+                                <ToastContainer />
                             </form>
                         </div>
                     </div>
