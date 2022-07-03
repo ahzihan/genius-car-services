@@ -2,11 +2,13 @@
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import About from './Pages/About/About';
+import AddService from './Pages/AddService/AddService';
 import ExpertDetails from './Pages/Home/Details/ExpertDetails';
 import ServiceDetails from './Pages/Home/Details/ServiceDetails';
 import Experts from './Pages/Home/Experts/Experts';
 import Home from './Pages/Home/Home/Home';
 import Login from './Pages/Login/Login';
+import ManageServices from './Pages/Manage/ManageServices';
 import Register from './Pages/Register/Register';
 import RequireAuth from './Pages/RequireAuth/RequireAuth';
 import Footer from './Pages/Shared/Footer/Footer';
@@ -31,6 +33,16 @@ function App() {
         <Route path='/servicedetails/:serviceId' element={
           <RequireAuth>
             <ServiceDetails></ServiceDetails>
+          </RequireAuth>
+        }></Route>
+        <Route path='/addservice' element={
+          <RequireAuth>
+            <AddService></AddService>
+          </RequireAuth>
+        }></Route>
+        <Route path='/manageservices' element={
+          <RequireAuth>
+            <ManageServices></ManageServices>
           </RequireAuth>
         }></Route>
       </Routes>
