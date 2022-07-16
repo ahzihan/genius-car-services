@@ -5,7 +5,7 @@ import './Login.css';
 import auth from '../../firebase.init';
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import Loading from '../Shared/Loading/Loading';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -95,7 +95,6 @@ const Login = () => {
                                     <button className="btn btn-primary text-white text-uppercase fw-bold"
                                         type="submit">Sign in with Facebook</button>
                                 </div>
-                                <ToastContainer />
                             </form>
                         </div>
                     </div>

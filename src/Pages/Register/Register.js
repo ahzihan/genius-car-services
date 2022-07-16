@@ -2,9 +2,8 @@ import React, { useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import auth from '../../firebase.init';
 import { useCreateUserWithEmailAndPassword, useUpdateProfile } from 'react-firebase-hooks/auth';
-import { async } from '@firebase/util';
 import Loading from '../Shared/Loading/Loading';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
@@ -101,7 +100,6 @@ const Register = () => {
                                     <button className="btn btn-primary text-white text-uppercase fw-bold"
                                         type="submit">Sign Up with Facebook</button>
                                 </div>
-                                <ToastContainer />
                             </form>
                         </div>
                     </div>
